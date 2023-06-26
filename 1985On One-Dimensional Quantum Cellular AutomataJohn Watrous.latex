@@ -1,0 +1,1158 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={On One-Dimensional Quantum Cellular Automata },
+  pdfauthor={John Watrous* Computer Sciences Department University of Wisconsin Madison, Wisconsin 53706},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{On One-Dimensional Quantum Cellular Automata}
+\author{John Watrous*\\
+Computer Sciences Department\\
+University of Wisconsin\\
+Madison, Wisconsin 53706}
+\date{}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+Since Richard Feynman introduced the notion of quantum computation in
+1982, various models of "quantum computers" have been proposed. These
+models include quantum Turing machines and quantum circuits. In this
+paper we define another quantum computational model, one-dimensional
+quantum cellular automata, and demonstrate that any quantum Turing
+machine can be efficiently simulated by a onedimensional quantum
+cellular automaton with constant slowdown. This can be accomplished by
+consideration of a restricted class of one-dimensional quantum cellular
+automata called one-dimensional partitioned quantum cellular automata.
+We also show that any one-dimensional partitioned quantum cellular
+automaton can be simulated by a quantum Turing machine with linear
+slowdown, but the problem of efficiently simulating an arbitrary
+one-dimensional quantum cellular automaton with a quantum Turing machine
+is left open. From this discussion, some interesting facts concerning
+these models are easily deduced.
+\end{abstract}
+
+\hypertarget{introduction}{%
+\section{Introduction}\label{introduction}}
+
+The idea that certain principles of quantum mechanics might be powerful
+computational tools has led to the study of various theoretical models
+of quantum computers. The archetypal quantum computer, as introduced by
+Richard Feynman in {[}1{]}, is a computer which can simulate quantum
+physical processes, and which operates in accordance with quantum
+physical laws. Feynman noted that the problem of simulating quantum
+physics with a computer based on classical physics appears to be
+intractable, thereby suggesting that quantum computers may be inherently
+more powerful than classical computers. David Deutsch later formalized
+the notion of quantum computation by defining what has become known as
+the
+
+\begin{itemize}
+\item
+  Supported in part by NSF Grant CCR-9208639. quantum Turing machine
+  (QTM) in {[}2{]}, and in {[}3{]} Ethan Bernstein and Umesh Vazirani,
+  expanding on Deutsch's work, showed that there exists a universal QTM
+  which can simulate any QTM to any required accuracy with at most
+  polynomial slowdown. Another quantum computational model, the quantum
+  circuit, was introduced by Andrew Yao in {[}4{]} and shown to be
+  equivalent to the quantum Turing machine.
+\end{itemize}
+
+It is not known whether or not these models are more powerful than their
+classical analogues. However, there is evidence to suggest that this is
+the case; most notably Peter Shor has shown in {[}5{]} that the integer
+factoring and discrete log problems can be solved in polynomial time
+using a QTM. (These problems are believed not to be solvable in
+polynomial time using a probabilistic Turing machine.)
+
+It is natural to extend the idea of quantum computation to other
+computational models; in this paper we discuss one-dimensional quantum
+cellular automata. Given any well-formed QTM, we give a construction of
+a one-dimensional quantum cellular automaton (1dQCA) which will
+efficiently simulate this QTM. This is accomplished by defining a
+restricted class of 1dQCA called one-dimensional partitioned quantum
+cellular automata (1d-PQCA). A 1d-PQCA is a 1d-QCA in which each cell is
+partitioned into three subcells (left, middle, and right), and where the
+next states of any given cell depend only on the contents of the right
+subcell of its left neighbor, the middle subcell of itself, and the left
+subcell of its right neighbor. This is the quantum analogue of the
+partitioned cellular automaton discussed by Kenichi Morita and Masateru
+Harao in {[}6{]}. The advantage of the 1d-PQCA class is that it is a
+simple matter to determine whether or not a given 1d-PQCA is
+well-formed, while this is not a trivial matter for an arbitrary 1d-QCA.
+
+It is not clear that an arbitrary \(1 \mathrm{~d}-\mathrm{QCA}\) can be
+efficiently simulated by a QTM. However, it is shown that any given
+1d-PQCA can be simulated by a QTM with linear slowdown. It is
+interesting to note that given any 1d-PQCA, the QTM which results from
+this con- struction will simulate the given 1d-PQCA with deterministic
+head position, i.e. if this QTM is observed at any time during its
+computation, the probability that the tape head will be observed in any
+given location will be either 0 or 1 . This allows for the construction
+of a QTM which will simulate, with deterministic head position, any
+given QTM with linear slowdown. Thus, for example, the position of the
+tape head of any such QTM could be observed at every time step without
+affecting its computation. (This is generally not the case for an
+arbitrary QTM.)
+
+The remainder of this paper will be organized as follows. In section 2,
+the one-dimensional quantum cellular automata model is defined. In
+section 3, the class of one-dimensional partitioned quantum cellular
+automata is defined, and necessary and sufficient conditions for the
+well-formedness of a 1d-PQCA are discussed. In section 4 , the quantum
+Turing machine model is reviewed and in section 5 , the equivalence of
+the quantum Turing machine model and the partitioned quantum cellular
+automata model is demonstrated. Finally, in section 6 , some facts
+resulting from this discussion are mentioned.
+
+\hypertarget{one-dimensional-quantum-cellular-automata}{%
+\section{One-Dimensional Quantum Cellular
+Automata}\label{one-dimensional-quantum-cellular-automata}}
+
+A one-dimensional quantum cellular automaton \(M\) is a quadruple
+\((Q, \delta, k, A)\) where \(Q\) is a finite set of states (including a
+distinguished quiescent state denoted by \(\epsilon\) ), \(\delta\) is a
+local transition function (described below), \(k\) is an integer
+denoting the acceptance cell, and \(A \subseteq Q\) is a set of
+accepting states. \(M\) is assumed to have a two-way infinite sequence
+of cells indexed by the integers (hereafter denoted by \(\mathbb{Z}\).)
+The neighborhood of each cell is defined to be that cell itself along
+with its closest neighbor on each side.
+
+A configuration of a 1d-QCA \(M\) is a map
+
+\[a: \mathbb{Z} \rightarrow Q\]
+
+where, for each integer \(n, a(n)\) denotes the state of the cell
+indexed by \(n\). For any configuration \(a\), it is assumed that there
+are only finitely many values of \(n\) for which \(a(n)\) is a
+non-quiescent state. Denote by \(\mathcal{C}=\mathcal{C}(M)\) the set of
+all configurations of \(M\), so that \(\mathcal{C}\) is countable for
+any given 1d-QCA \(M\). For any \(a \in \mathcal{C}\), define \(|a|\)
+(the length of \(a\) ) to be the maximum number of consecutive cells
+such that the first and last cells are non-quiescent. Any configuration
+of \(M\) in which the cell indexed by \(k\) contains an element of \(A\)
+is said to be an accepting configuration and all other configurations
+are non-accepting configurations.
+
+The local transition function \(\delta\) is a map
+
+\[\delta: Q^{4} \longrightarrow \mathbb{C}\]
+
+with
+
+\[\delta(\epsilon, \epsilon, \epsilon, q)= \begin{cases}1 & \text { if } q=\epsilon \\ 0 & \text { if } q \neq \epsilon\end{cases}\]
+
+which describes the evolution of \(M\). (Here \(\mathbb{C}\) denotes the
+field of complex numbers.) Suppose that at some given time \(t\), three
+consecutive cells of \(M\) are in states \(q_{1}, q_{2}\) and \(q_{3}\)
+respectively. Then for every state \(q \in Q\), the cell which contained
+\(q_{2}\) at time \(t\) will, at time \(t+1\), update to the state \(q\)
+with amplitude \(\delta\left(q_{1}, q_{2}, q_{3}, q\right)\). Every cell
+updates simultaneously in this manner, so that globally, if \(M\) is in
+some configuration \(a \in \mathcal{C}\) at time \(t\), then the
+amplitude with which \(M\) transforms to any configuration
+\(b \in \mathcal{C}\) at time \(t+1\) is defined to be the product of
+the amplitudes with which each cell of \(a\) transforms to the
+corresponding cell of \(b\), i.e.
+
+\[\prod_{n \in \mathbb{Z}} \delta(a(n-1), a(n), a(n+1), b(n)) .\]
+
+(This product is guaranteed to exist by (1).)
+
+Thus, any configuration of \(M\) will transform into multiple "next
+configurations", where the transformation to each individual
+configuration has an associated amplitude. The evolution behaves as if
+all of these transformations occur simultaneously, so that after some
+number of steps, \(M\) will have evolved along many computation paths
+simultaneously. Each path has an associated amplitude which is defined
+to be the product of the amplitudes of the transformations along that
+path.
+
+Multiple paths with differing amplitudes may lead from one given
+configuration to another. This effect is known as interference. If \(M\)
+is assumed to be in some configuration \(a\) and is allowed to evolve
+for, say \(l\) steps, then \(M\) will be in a linear superposition of
+configurations. For each configuration \(b\) in such a superposition, we
+associate with it an amplitude which is the sum of the amplitudes of all
+paths of length \(l\) from \(a\) to \(b\). It may therefore be the case,
+for example, that a configuration will have amplitude zero in some
+superposition, despite the fact that multiple paths of nonzero amplitude
+lead to it.
+
+If a 1d-QCA \(M\) is observed while in some superposition of
+configurations, the observer will not see this superposition. Rather,
+the act of observation forces the machine to choose one of the
+configurations in the given superposition randomly, so that exactly one
+configuration will be observed. The probability that any given
+configuration is observed is the absolute square of the amplitude
+associated with that configuration, i.e. the absolute square of the sum
+of the amplitudes of all paths which lead to that configuration. The act
+of observation has the effect of altering the machine, so that
+immediately after the observation occurs the machine will be in a single
+configuration, and no longer a superposition of configurations. (More
+general types of observations are possible, but will be ignored for the
+purposes of this paper.)
+
+For any 1d-QCA \(M\) and input configuration \(a\), we are interested in
+whether or not an accepting configuration will be observed after some
+number of steps. The probability that \(M\) accepts a after \(l\) steps
+is simply the probability of observing any accepting configuration after
+\(l\) steps, assuming that \(M\) is initially placed in configuration
+\(a\) and is not observed before \(l\) steps have passed.
+
+Since each configuration in a given superposition is observed with a
+certain probability, it is necessary that the sum of the probabilities
+be exactly one. Thus, allowed local transition functions \(\delta\) must
+be restricted to those that guarantee this condition for any
+superposition resulting from any given input. A machine with such a
+local transition function is said to be wellformed. This will be
+formalized presently.
+
+Given any 1d-QCA \(M\), let \(\ell_{2}(\mathcal{C})\) denote the space
+of all complex valued functions with domain
+\(\mathcal{C}=\mathcal{C}(M)\) and bounded \(\ell_{2}\)-norm, i.e.
+
+\[\ell_{2}(\mathcal{C})=\left\{x: \mathcal{C} \rightarrow \mathbb{C} \mid\left(\sum_{a \in \mathcal{C}} x(a) \overline{x(a)}\right)^{1 / 2}<\infty\right\} .\]
+
+Then \(\ell_{2}(\mathcal{C})\) is a Hilbert space with respect to the
+inner product
+\(\langle\cdot, \cdot\rangle: \ell_{2}(\mathcal{C}) \times \ell_{2}(\mathcal{C}) \rightarrow \mathbb{C}\)
+defined by
+
+\[\left\langle x_{1}, x_{2}\right\rangle=\sum_{a \in \mathcal{C}} x_{1}(a) \overline{x_{2}(a)} .\]
+
+Any superposition of \(M\) can now be identified with an element
+\(x \in \ell_{2}(\mathcal{C})\), where \(x(a) \in \mathbb{C}\) denotes
+the amplitude associated with configuration \(a\) in this superposition.
+Thus, the probability of observing \(a\) from this superposition is
+\(|x(a)|^{2}\) for any \(a \in \mathcal{C}\). We must therefore have
+
+\[\sum_{a \in \mathcal{C}}|x(a)|^{2}=1\]
+
+for any superposition \(x\). The sum in (2) is exactly \(\|x\|^{2}\) by
+definition, so we define
+
+\[\mathcal{S}=\left\{x \in \ell_{2}(\mathcal{C}) \mid\|x\|=1\right\}\]
+
+to be the set of all possible superpositions of \(M\). Each
+superposition of a given 1d-QCA \(M\) will, in one time-step, evolve
+into a new superposition according to the local transition function of
+\(M\). We can associate with any \(M\) a function \(E\) which will map
+any given superposition to this next superposition; if \(x\) is some
+superposition of \(M\) at time \(t\), then \(M\) will be in the
+superposition \(E x\) at time \(t+1\). In general, after \(l\) steps,
+\(M\) will be in the superposition \(E^{l} x\). \(E\) is the
+time-evolution operator of \(M\), and can be explicitly defined as
+follows. For all \(a, b \in \mathcal{C}\) let \(\alpha(a, b)\) denote
+the amplitude with which configuration \(a\) transforms into
+configuration \(b\), i.e.
+
+\[\alpha(a, b)=\prod_{n \in \mathbb{Z}} \delta(a(n-1), a(n), a(n+1), b(n)),\]
+
+and for each \(x \in \ell_{2}(\mathcal{C})\) and \(b \in \mathcal{C}\)
+define
+
+\[\operatorname{Ex}(b)=\sum_{a \in \mathcal{C}} \alpha(a, b) x(a)\]
+
+Thus, we say that \(M=(Q, \delta, k, A)\) is a well formed
+one-dimensional quantum cellular automaton (write
+\(M \in 1 \mathrm{~d}-\mathrm{QCA}\) ) if and only if the corresponding
+timeevolution operator \(E\) preserves \(\ell_{2}\)-norm, i.e.
+
+\[x \in \mathcal{S} \Longleftrightarrow E x \in \mathcal{S} .\]
+
+\hypertarget{partitioned-quantum-cellular-au--tomata}{%
+\section{Partitioned Quantum Cellular Au-
+tomata}\label{partitioned-quantum-cellular-au--tomata}}
+
+In general, given an arbitrary \(M=(Q, \delta, k, A)\), it is not a
+trivial matter to determine whether or not \(M\) is well formed. For
+this reason we now define a restricted class of
+\(1 \mathrm{~d}-\mathrm{QCA}\) called partitioned quantum cellular
+automata for which this can easily be determined. This is a
+generalization of (deterministic) partitioned cellular automata
+discussed by Morita and Harao in {[}6{]}.
+
+A one-dimensional partitioned quantum cellular automaton is a 1d-QCA in
+which each cell is partitioned into three subcells: a left subcell, a
+middle subcell and a right subcell. (The set of states \(Q\) is
+decomposed accordingly.) The next state(s) of any cell may now only
+depend upon the states of the left subcell of the right neighbor, the
+middle subcell of the cell itself, and the right subcell of the left
+neighbor.
+
+More formally, let \(M=(Q, \delta, k, A)\) as in the \(1 \mathrm{~d}\)
+QCA case, where \(Q\) and \(\delta\) are restricted as follows. Let
+
+\[Q=Q_{l} \times Q_{m} \times Q_{r}\]
+
+for finite sets \(Q_{l}, Q_{m}\) and \(Q_{r}\), (and again let
+\(\epsilon\) denote the distinguished quiescent element of \(Q\).) Let
+\(\Lambda\) be an \(|Q| \times|Q|\) matrix over \(\mathbb{C}\) having
+the form
+
+\[\Lambda=\left(\begin{array}{cccc}
+\lambda\left(q_{1}, q_{1}\right) & \lambda\left(q_{1}, q_{2}\right) & \ldots & \lambda\left(q_{1}, q_{|Q|}\right) \\
+\lambda\left(q_{2}, q_{1}\right) & \lambda\left(q_{2}, q_{2}\right) & \ldots & \lambda\left(q_{2}, q_{|Q|}\right) \\
+\vdots & \vdots & \ddots & \vdots \\
+\lambda\left(q_{|Q|}, q_{1}\right) & \lambda\left(q_{|Q|}, q_{2}\right) & \ldots & \lambda\left(q_{|Q|}, q_{|Q|}\right)
+\end{array}\right)\]
+
+where \(\lambda: Q \times Q \longrightarrow \mathbb{C}\) must satisfy
+
+\[\lambda(\epsilon, q)=\lambda(q, \epsilon)= \begin{cases}1 & \text { if } q=\epsilon \\ 0 & \text { if } q \neq \epsilon .\end{cases}\]
+
+For any state \(q=\left(q_{l}, q_{m}, q_{r}\right)\) define
+
+\[l(q)=q_{l}, \quad m(q)=q_{m}, \quad r(q)=q_{r},\]
+
+and define \(\delta\) as
+
+\[\delta\left(q_{1}, q_{2}, q_{3}, q\right)=\lambda\left(\left(l\left(q_{3}\right), m\left(q_{2}\right), r\left(q_{1}\right)\right), q\right)\]
+
+for all \(q_{1}, q_{2}, q_{3}, q \in Q\). Since a given matrix
+\(\Lambda\) completely determines \(\delta\) in this manner, we may
+write \(M=(Q, \Lambda, k, A)\) rather than \(M=(Q, \delta, k, A)\) for a
+1d-PQCA \(M\) whenever convenient.
+
+The behavior of a partitioned quantum cellular automaton \(M\) is, in
+general, simpler than that of an arbitrary 1d-QCA. Suppose that \(M\) is
+in configuration \(a\). Then after one time step, for any given
+\(n \in \mathbb{Z}\), the state of the cell indexed by \(n\) will be
+transformed to each state \(q\) with amplitude
+
+\[\begin{aligned}
+& \delta(a(n-1), a(n), a(n+1), q) \\
+& \quad=\lambda((l(a(n+1)), m(a(n)), r(a(n-1))), q) .
+\end{aligned}\]
+
+In order to simplify this, we will define a permutation
+\(\sigma: \mathcal{C} \longrightarrow \mathcal{C}\) as
+
+\[\sigma a(n)=(l(a(n+1)), m(a(n)), r(a(n-1)))\]
+
+for all \(n \in \mathbb{Z}\). The action of the permutation \(\sigma\)
+on any configuration \(a\) can be illustrated as follows:
+
+{image}
+
+Now, (4) is equivalent to
+
+\[\delta(a(n-1), a(n), a(n+1), q)=\lambda(\sigma a(n), q),\]
+
+so that applying \(\delta\) to each neighborhood of some configuration
+\(a\) is equivalent to first applying \(\sigma\) to \(a\) and then
+applying \(\lambda\) to each individual cell of \(\sigma a\), i.e.
+\(\sigma a(n)\) is transformed into each state \(q\) with amplitude
+\(\lambda(\sigma a(n), q)\) for every \(n \in \mathbb{Z}\).
+
+If, for such an \(M\), we have \(M \in 1 \mathrm{~d}-\mathrm{QCA}\) we
+will say that \(M\) is a well formed one-dimensional partitioned quantum
+cellular automaton (write \(M \in 1\) d-PQCA.) The following theorem
+allows us to characterize onedimensional partitioned cellular automata
+in terms of the matrix \(\Lambda\).
+
+Theorem 3.1 Let \(M=(Q, \Lambda, k, A)\) with \(\Lambda\) as above. Then
+\(M \in 1 d-P Q C A\) if and only if \(\Lambda\) is unitary.
+
+The remainder of this section will be devoted to proving this theorem.
+
+For each \(a, b \in \mathcal{C}\) define
+
+\[u_{b}(a)=\overline{\alpha(a, b)}\]
+
+and
+
+\[v_{b}(a)=\alpha(b, a) .\]
+
+Lemma 3.1 Let \(M=(Q, \Lambda, k, A)\), where \(\Lambda\) satisfies (3).
+Then we have
+
+\[\#\left\{a \in \mathcal{C} \mid u_{b}(a) \neq 0\right\}<\infty\]
+
+and
+
+\[\#\left\{a \in \mathcal{C} \mid v_{b}(a) \neq 0\right\}<\infty\]
+
+for any \(b \in \mathcal{C}\).
+
+Proof. Given \(b \in \mathcal{C}\), assume that \(u_{b}(a) \neq 0\). By
+definition
+
+\[u_{b}(a)=\prod_{n \in \mathbb{Z}} \overline{\lambda(\sigma a(n), b(n))} .\]
+
+Since \(b \in \mathcal{C}\) and \(\lambda(q, \epsilon)=0\) for
+\(q \neq \epsilon, a\) must be such that \(\sigma a(n)=b(n)=\epsilon\)
+for all but finitely many \(n\). There are finitely many such
+\(a \in \mathcal{C}\).
+
+(6) follows similarly.
+
+By Lemma 3.1, the sums
+
+\[\sum_{a \in \mathcal{C}} u_{b}(a) \overline{u_{b}(a)}\]
+
+and
+
+\[\sum_{a \in \mathcal{C}} v_{b}(a) \overline{v_{b}(a)}\]
+
+contain only finitely many nonzero terms and therefore converge, so we
+have that \(u_{b}\) and \(v_{b}\) are elements of
+\(\ell_{2}(\mathcal{C})\) for each \(b \in \mathcal{C}\). Lemma 3.2
+\(\Lambda\) unitary
+\(\Longrightarrow\left\{u_{b}\right\}_{b \in \mathcal{C}}\) and
+\(\left\{v_{b}\right\}_{b \in \mathcal{C}}\) are orthonormal sequences
+in \(\ell_{2}(\mathcal{C})\).
+
+Proof. Given \(a, b \in \mathcal{C}\) we will show
+
+\[\left\langle u_{a}, u_{b}\right\rangle= \begin{cases}1 & \text { if } a=b \\ 0 & \text { if } a \neq b\end{cases}\]
+
+For each \(m \in \mathbb{Z}, q \in Q\), define
+\(S_{m}^{q}: \mathcal{C} \longrightarrow \mathcal{C}\) as
+
+\[S_{m}^{q}(c)(n)= \begin{cases}c(n) & \text { if } n>m \\ q & \text { if } n=m \\ c(n+1) & \text { if } n<m\end{cases}\]
+
+for all \(n \in \mathbb{Z}\), and also define
+\(R_{m}^{q}: \mathcal{C} \longrightarrow \mathcal{C}\) as
+
+\[R_{m}^{q}(c)(n)= \begin{cases}c(n) & \text { if } n \neq m \\ q & \text { if } n=m\end{cases}\]
+
+for all \(n \in \mathbb{Z}\).
+
+Since \(\sigma\) is one-to-one and onto, we have
+
+\[\begin{aligned}
+\left\langle u_{a}, u_{b}\right\rangle & =\sum_{c \in \mathcal{C}} u_{a}\left(\sigma^{-1} c\right) \overline{u_{b}\left(\sigma^{-1} c\right)} \\
+& =\sum_{c \in \mathcal{C}} \prod_{n \in \mathbb{Z}} \overline{\lambda(c(n), a(n))} \lambda(c(n), b(n)) .
+\end{aligned}\]
+
+By Lemma 3.1 there are only finitely many values of \(c\) for which the
+summand is nonzero, so we are free to change the order of summation in
+(8) as follows
+
+\[\left\langle u_{a}, u_{b}\right\rangle=\sum_{c \in \mathcal{C}} \sum_{q \in Q} P \overline{\lambda(q, a(m))} \lambda(q, b(m))\]
+
+where
+
+\[P=\prod_{n \neq m} \overline{\lambda\left(S_{m}^{q}(c)(n), a(n)\right)} \lambda\left(S_{m}^{q}(c)(n), b(n)\right)\]
+
+and \(m\) is any integer. \(P\) is independent of \(q\), so we have
+
+\[\left\langle u_{a}, u_{b}\right\rangle=\sum_{c \in \mathcal{C}} P \sum_{q \in Q} \overline{\lambda(q, a(m))} \lambda(q, b(m)) .\]
+
+Suppose that \(a \neq b\). Then there must exist \(m \in \mathbb{Z}\)
+such that \(a(m) \neq b(m)\). \(\Lambda\) is unitary, so that
+
+\[\sum_{q \in Q} \overline{\lambda(q, a(m))} \lambda(q, b(m))=0\]
+
+and therefore by (9) we have
+\(\left\langle u_{a}, u_{b}\right\rangle=0\).
+
+Now consider \(\left\langle u_{a}, u_{a}\right\rangle\). From (9)
+
+\[\left\langle u_{a}, u_{a}\right\rangle=\sum_{c \in \mathcal{C}} P \sum_{q \in Q}|\lambda(q, a(m))|^{2}\]
+
+for
+
+\[P=\prod_{n \neq m}\left|\lambda\left(S_{m}^{q}(c)(n), a(n)\right)\right|^{2}\]
+
+For any \(p \in Q\) we have \(\sum_{q \in Q}|\lambda(p, q)|^{2}=1\),
+since \(\Lambda\) is unitary. Thus
+
+\[\begin{aligned}
+\left\langle u_{a}, u_{a}\right\rangle & =\sum_{c \in \mathcal{C}} \prod_{n \neq m}\left|\lambda\left(S_{m}^{q}(c)(n), a(n)\right)\right|^{2} \\
+& =\sum_{c \in \mathcal{C}} \prod_{n \neq m}\left|\lambda\left(S_{m}^{\epsilon}(c)(n), a(n)\right)\right|^{2} \\
+& =\sum_{c \in \mathcal{C}} \prod_{n \in \mathbb{Z}}\left|\lambda\left(c(n), R_{m}^{\epsilon}(a)(n)\right)\right|^{2} \\
+& =\left\langle u_{a_{1}}, u_{a_{1}}\right\rangle
+\end{aligned}\]
+
+for \(a_{1}=R_{m}^{\epsilon}(a)\).
+
+Now \(a \in \mathcal{C}\), and therefore there exists a finite set
+\(\left\{m_{1}, \ldots, m_{k}\right\}\) for which
+
+\[n \notin\left\{m_{1}, \ldots, m_{k}\right\} \Longrightarrow a(n)=\epsilon .\]
+
+If we repeat the process resulting in (10) for each
+\(m=m_{1}, m_{2}, \ldots, m_{k}\), we get
+\(\left\langle u_{a}, u_{a}\right\rangle=\left\langle u_{a_{k}}, u_{a_{k}}\right\rangle\)
+for
+\(a_{k}=R_{m_{1}}^{\epsilon}\left(R_{m_{2}}^{\epsilon}\left(\cdots\left(R_{m_{k}}^{\epsilon}(a)\right) \cdots\right)\right)\).
+Since \(a_{k}(n)=\epsilon\) for all \(n \in \mathbb{Z}\) we have
+
+\[\begin{aligned}
+\left\langle u_{a}, u_{a}\right\rangle & =\left\langle u_{a_{k}}, u_{a_{k}}\right\rangle \\
+& =\sum_{c \in \mathcal{C}} \prod_{n \in \mathbb{Z}}|\lambda(c(n), \epsilon)|^{2}=1,
+\end{aligned}\]
+
+and so we have shown (7).
+
+A slight modification of the above argument shows that
+\(\left\{v_{b}\right\}_{b \in \mathcal{C}}\) is also an orthonormal
+sequence.
+
+Proof of Theorem 3.1. Assume that we are given \(M=(Q, \Lambda, k, A)\)
+with \(\Lambda\) unitary. We will show that \(E\), the time-evolution
+operator of \(M\), is unitary.
+
+By definition, we have
+
+\[E x(b)=\sum_{a \in \mathcal{C}} x(a) \overline{u_{b}(a)} .\]
+
+so that
+
+\[E x(b)=\left\langle x, u_{b}\right\rangle\]
+
+for every \(x \in \ell_{2}(\mathcal{C})\) and \(b \in \mathcal{C}\).
+Also define \(F\) as
+
+\[F x(b)=\sum_{a \in \mathcal{C}} x(a) \overline{v_{b}(a)},\]
+
+so that
+
+\[F x(b)=\left\langle x, v_{b}\right\rangle\]
+
+for every \(x \in \ell_{2}(\mathcal{C})\) and \(b \in \mathcal{C}\). By
+Lemma 3.1, \(\left\{u_{b}\right\}_{b \in \mathcal{C}}\) is an
+orthonormal sequence. So, by Bessel's inequality
+
+\[\begin{aligned}
+\|E x\|^{2} & =\sum_{b \in \mathcal{C}} \operatorname{Ex}(b) \overline{\operatorname{Ex}(b)} \\
+& =\sum_{b \in \mathcal{C}}\left|\left\langle x, u_{b}\right\rangle\right|^{2} \\
+& \leq\|x\|^{2},
+\end{aligned}\]
+
+for any \(x \in \ell_{2}(\mathcal{C})\). Thus \(E\) is a bounded linear
+operator, and hence we have that
+
+\[\langle E x, y\rangle=\sum_{b \in \mathcal{C}} \sum_{a \in \mathcal{C}} x(a) \overline{u_{b}(a) y(b)}\]
+
+is a bounded bilinear form. This allows us (see {[}7{]}, for example) to
+change the order of summation in (11) to get
+
+\[\begin{aligned}
+\langle E x, y\rangle & =\sum_{a \in \mathcal{C}} \sum_{b \in \mathcal{C}} x(a) \overline{u_{b}(a) y(b)} \\
+& =\sum_{a \in \mathcal{C}} x(a) \sum_{b \in \mathcal{C}} \overline{y(b)} v_{a}(b) \\
+& =\langle x, F y\rangle
+\end{aligned}\]
+
+for any \(x, y \in \ell_{2}(\mathcal{C})\), so that \(E^{*}=F\).
+
+Now, for any \(x \in \ell_{2}(\mathcal{C})\) and \(b \in \mathcal{C}\)
+we have, by applying Lemma 3.1 and Lemma 3.2,
+
+\[\begin{aligned}
+E^{*} \operatorname{Ex}(b) & =\sum_{a \in \mathcal{C}} \operatorname{Ex}(a) \overline{v_{b}(a)} \\
+& =\sum_{a \in \mathcal{C}} \sum_{c \in \mathcal{C}} x(c) \overline{u_{a}(c) v_{b}(a)} \\
+& =\sum_{c \in \mathcal{C}} \sum_{a \in \mathcal{C}} x(c) v_{c}(a) \overline{v_{b}(a)} \\
+& =\sum_{c \in \mathcal{C}} x(c)\left\langle v_{c}, v_{b}\right\rangle \\
+& =x(b)
+\end{aligned}\]
+
+so that \(E^{*} E=I\). Similarly
+
+\[E E^{*} x(b)=\sum_{c \in \mathcal{C}} x(c)\left\langle u_{c}, u_{b}\right\rangle=x(b)\]
+
+for any \(x \in \ell_{2}(\mathcal{C}), b \in \mathcal{C}\), so that
+\(E E^{*}=I\).
+
+Thus, \(E\) is unitary and hence preserves \(\ell_{2}\)-norm. We
+therefore have that \(M \in 1 \mathrm{~d}-\mathrm{PQCA}\).
+
+The converse is straightforward.
+
+Corollary 3.1 For any \(M \in 1 d-P Q C A\), the associated
+time-evolution operator \(E\) is unitary.
+
+\hypertarget{quantum-turing-machines}{%
+\section{Quantum Turing Machines}\label{quantum-turing-machines}}
+
+In this section we will review the quantum Turing machine model as
+defined in {[}3{]}. A quantum Turing machine \(M\) is a quintuple
+\((K, \Sigma, \mu, k, A)\) where \(K\) is a finite set of states,
+\(\Sigma\) is a finite tape alphabet (including a distinguished blank
+symbol, denoted by \(b\) ), \(\mu\) is a local transition function
+(described below), \(k\) is an integer denoting the distinguished
+acceptance tape square, and \(A \subseteq \Sigma\) is a set of accepting
+symbols. \(M\) is assumed to have a single read-write tape head and a
+single two-way infinite tape with tape squares indexed by
+\(\mathbb{Z}\).
+
+A configuration of a QTM \(M\) is a triple \((s, h, c)\), where
+\(s \in K\) denotes the current state of \(M, h \in \mathbb{Z}\) denotes
+the index of the tape square over which the tape head is currently
+located, and \(c\) is a map from \(\mathbb{Z}\) to \(\Sigma\) which
+describes the contents of the tape. For any configuration of \(M\) it is
+assumed that the number of tape squares containing non-blank symbols is
+finite. Any configuration of \(M\) in which the tape cell indexed by
+\(k\) contains an element of \(A\) is said to be an accepting
+configuration and all other configurations are non-accepting
+configurations.
+
+The local transition function \(\mu\) is a map
+
+\[\mu: K \times \Sigma \times \Sigma \times K \times\{L, R\} \longrightarrow \mathbb{C}\]
+
+which describes the evolution of \(M\). Suppose that, at some particular
+time, the current state of \(M\) is \(s\) and the tape head of \(M\) is
+located above a tape square which contains the symbol \(\tau\). Then for
+every triple
+\(\left(\tau^{\prime}, s^{\prime}, d\right) \in \Sigma \times K \times\{L, R\}, M\)
+will write the symbol \(\tau^{\prime}\) in the currently scanned tape
+square, change internal state to \(s^{\prime}\) and move the tape head
+in direction \(d\) with amplitude
+\(\mu\left(s, \tau, \tau^{\prime}, s^{\prime}, d\right)\)
+
+As in the 1d-QCA case, the computation behaves as if all of these
+transitions occur simultaneously, so that after some number of steps
+\(M\) will have traversed many different computation paths
+simultaneously, each with an associated amplitude. The amplitude
+associated with each path is defined to be the product of the amplitudes
+of the transitions along that path. After \(l\) steps, say, \(M\) will
+be in a linear superposition of configurations, and the amplitude
+associated with each configuration will be the sum of the amplitudes
+along all paths of length \(l\) to that configuration.
+
+If observed while in a superposition of configurations, \(M\) will
+randomly choose a single configuration which will be seen; again the
+probability that a given configuration will be observed is the absolute
+square of the amplitude associated with that configuration. Allowed
+local transition functions \(\mu\) must be restricted to those that
+guarantee that the sum of these probabilities will be one for any given
+superposition. Such a QTM is said to be well-formed. (Write \(M \in\)
+QTM whenever \(M\) is a well-formed quantum Turing machine.) We state,
+without proof, the following theorem, due to Bernstein and Vazirani,
+which allows us to characterize well-formed quantum Turing machines in
+terms of their local transition functions:
+
+Theorem 4.1 (Bernstein \& Vazirani) Given any
+\(M=(K, \Sigma, \mu, k, A)\) as above, \(M \in Q T M\) if and only if
+(i)
+\(\forall\left(s_{1}, \tau_{1}\right),\left(s_{2}, \tau_{2}\right) \in K \times \Sigma\)
+:
+
+\[\begin{array}{r}
+\sum_{\xi, s, d} \mu\left(s_{1}, \tau_{1}, \xi, s, d\right) \overline{\mu\left(s_{2}, \tau_{2}, \xi, s, d\right)} \\
+= \begin{cases}1 & \text { if }\left(s_{1}, \tau_{1}\right)=\left(s_{2}, \tau_{2}\right) \\
+0 & \text { if }\left(s_{1}, \tau_{1}\right) \neq\left(s_{2}, \tau_{2}\right)\end{cases}
+\end{array}\]
+
+and (ii)
+\(\forall\left(s_{1}, \tau_{1}, \xi_{1}\right),\left(s_{2}, \tau_{2}, \xi_{2}\right) \in K \times \Sigma \times \Sigma\)
+:
+
+\[\sum_{s} \mu\left(s_{1}, \tau_{1}, \xi_{1}, s, L\right) \overline{\mu\left(s_{2}, \tau_{2}, \xi_{2}, s, R\right)}=0 .\]
+
+\hypertarget{equivalence-of-qtm-and-1d-pqca-models}{%
+\section{Equivalence of QTM and 1d-PQCA
+Models}\label{equivalence-of-qtm-and-1d-pqca-models}}
+
+We now show that for any \(M_{t m} \in \mathrm{QTM}\), there is an
+\(M_{c a} \in 1 \mathrm{~d}-\mathrm{PQCA}\) which simulates \(M_{t m}\)
+with constant slowdown, and similarly for any
+\(M_{c a} \in 1 \mathrm{~d}-\mathrm{PQCA}\) there is an
+\(M_{t m} \in \mathrm{QTM}\) which simulates \(M_{c a}\) with linear
+slowdown.
+
+\hypertarget{d-pqca-simulation-of-a-qtm}{%
+\subsection{1d-PQCA Simulation of a
+QTM}\label{d-pqca-simulation-of-a-qtm}}
+
+Let
+\(M_{t m}=\left(K, \Sigma, \mu, k_{t m}, A_{t m}\right) \in \mathrm{QTM}\)
+and let \(M_{c a}=\left(Q, \Lambda, k_{c a}, A_{c a}\right) \in 1\)
+d-PQCA. We will say that \(M_{c a}\) simulates \(M_{t m}\) if and only
+if there exists a lineartime computable function
+\(T: \mathcal{C}\left(M_{t m}\right) \rightarrow \mathcal{C}\left(M_{c a}\right)\)
+and a function
+\(f: \mathbb{Z}^{+} \times \mathbb{Z}^{+} \rightarrow \mathbb{Z}^{+}\)such
+that for any given configuration
+\(a \in \mathcal{C}\left(M_{t m}\right)\), the probability that
+\(M_{t m}\) accepts \(a\) after \(t\) steps is equal to the probability
+that \(M_{c a}\) accepts \(T(a)\) after \(f(t,|T(a)|)\) steps.
+
+Without loss of generality, we can assume that the QTM which is to be
+simulated has the property that any given state is only entered while
+the tape head is moving in one direction, due to the following lemma of
+Bernstein and Vazirani.
+
+Lemma 5.1 (Bernstein \& Vazirani) Given any \(M \in Q T M\), there
+exists an \(M^{\prime} \in Q T M\) which simulates \(M\) with constant
+slowdown, and which satisfies the following property: (P1)
+\(M^{\prime}\) enters each state while moving in exactly one direction,
+i.e. if
+\(\mu^{\prime}\left(s_{1}, \tau_{1}, \xi_{1}, s_{1}^{\prime}, d_{1}\right)\)
+and
+\(\mu^{\prime}\left(s_{2}, \tau_{2}, \xi_{2}, s_{2}^{\prime}, d_{2}\right)\)
+are both nonzero, then \(d_{1}=d_{2}\).
+
+Thus, given \(M_{t m}=\left(K, \Sigma, \mu, k_{t m}, A_{t m}\right)\)
+satisfying \((P 1), K\) can be partitioned into two sets: \(K_{l}\) and
+\(K_{r}\), such that \(M\) enters states in \(K_{l}\) only when moving
+left, and enters states in \(K_{r}\) only when moving right.
+
+We now define a
+\(1 \mathrm{~d}-\mathrm{PQCA} M_{c a}=\left(Q, \Lambda, k_{c a}, A_{c a}\right)\)
+which will simulate \(M_{t m}\). Define
+\(Q=Q_{l} \times Q_{m} \times Q_{r}\) with
+
+\[Q_{l}=K_{l} \cup\{\#\}, \quad Q_{m}=\Sigma, \quad Q_{r}=K_{r} \cup\{\#\} .\]
+
+The quiescent element of \(Q\) is defined to be (\#, b, \#), where \(b\)
+is the blank symbol of \(M_{t m}\). Define \(\Lambda\) as follows:
+
+(i) for each
+\(\left(s_{1}, \tau_{1}\right),\left(s_{2}, \tau_{2}\right) \in K_{l} \times \Sigma\)
+let
+
+\[\lambda\left(\left(s_{1}, \tau_{1}, \#\right),\left(s_{2}, \tau_{2}, \#\right)\right)=\mu\left(s_{1}, \tau_{1}, \tau_{2}, s_{2}, L\right),\]
+
+(ii) for each
+\(\left(s_{1}, \tau_{1}\right) \in K_{l} \times \Sigma,\left(s_{2}, \tau_{2}\right) \in K_{r} \times \Sigma\)
+let
+
+\[\begin{aligned}
+& \lambda\left(\left(s_{1}, \tau_{1}, \#\right),\left(\#, \tau_{2}, s_{2}\right)\right)=\mu\left(s_{1}, \tau_{1}, \tau_{2}, s_{2}, R\right), \\
+& \lambda\left(\left(\#, \tau_{2}, s_{2}\right),\left(s_{1}, \tau_{1}, \#\right)\right)=\mu\left(s_{2}, \tau_{2}, \tau_{1}, s_{1}, L\right),
+\end{aligned}\]
+
+(iii) for each
+\(\left(s_{1}, \tau_{1}\right),\left(s_{2}, \tau_{2}\right) \in K_{r} \times \Sigma\)
+let
+
+\[\lambda\left(\left(\#, \tau_{1}, s_{1}\right),\left(\#, \tau_{2}, s_{2}\right)\right)=\mu\left(s_{1}, \tau_{1}, \tau_{2}, s_{2}, R\right),\]
+
+(iv) for any \(q_{1}, q_{2} \in Q\) for which
+\(\lambda\left(q_{1}, q_{2}\right)\) has not already been defined in (i)
+- (iii), let
+
+\[\lambda\left(q_{1}, q_{2}\right)= \begin{cases}1 & \text { if } q_{1}=q_{2} \\ 0 & \text { otherwise }\end{cases}\]
+
+Let \(k_{c a}=k_{t m}\) and define
+
+\[A_{c a}=\left\{\left(q_{l}, q_{m}, q_{r}\right) \in Q \mid q_{m} \in A_{t m}\right\} .\]
+
+A straightforward application of Theorem 3.1 and Theorem 4.1 yields the
+following
+
+Lemma 5.2 If \(M_{t m} \in Q T M\) then \(M_{c a} \in 1 d-P Q C A\).
+
+For \((s, h, c) \in \mathcal{C}\left(M_{t m}\right)\), define
+\(T((s, h, c)) \in \mathcal{C}\left(M_{c a}\right)\) as follows. For
+each \(n \in \mathbb{Z}\) let
+
+\[\begin{aligned}
+& T((s, h, c))(n) \\
+& = \begin{cases}(\#, c(n), \#) & \text { if } s \in K_{l} \text { and } n \neq h+1 \\
+(s, c(n), \#) & \text { if } s \in K_{l} \text { and } n=h+1 \\
+(\#, c(n), \#) & \text { if } s \in K_{r} \text { and } n \neq h-1 \\
+(\#, c(n), s) & \text { if } s \in K_{r} \text { and } n=h-1 .\end{cases}
+\end{aligned}\]
+
+Lemma 5.3 For any \(n \in \mathbb{Z}^{+}\), the probability that
+\(M_{t m}\) accepts \((s, h, c)\) after \(n\) steps is equal to the
+probability that \(M_{c a}\) accepts \(T((s, h, c))\) after \(n\) steps.
+
+Proof. {[}Sketch{]} For any configuration \(a\) of \(M_{t m}\), the
+symbol contained in the tape square indexed by \(n\) is equal to the
+contents of the middle subcell of the cell indexed by \(n\) in \(T(a)\).
+Recall that the evolution of a 1d-PQCA may be decomposed into two steps:
+applying the permutation \(\sigma\) to the current configuration, then
+transforming each cell according to \(\lambda\). Now, for each
+\(n, \sigma T((s, h, c))(n)\) will have have a non-\# state in its left
+or right subcell exactly when \(h=n\), thereby simulating the presence
+of the tape head at this location. By inspection of the definition of
+\(\lambda\), it is clear that \(M_{c a}\) will evolve in accordance with
+\(M_{t m}\).
+
+Together, Lemma 5.1, Lemma 5.2 and Lemma 5.3 give us
+
+Theorem 5.1 Given any \(M_{t m} \in Q T M\) there is an
+\(M_{c a} \in 1 d-P Q C A\) which simulates \(M_{t m}\) with constant
+slowdown.
+
+\hypertarget{qtm-simulation-of-a-1d-pqca}{%
+\subsection{QTM Simulation of a
+1d-PQCA}\label{qtm-simulation-of-a-1d-pqca}}
+
+Again, let
+\(M_{t m}=\left(K, \Sigma, \mu, k_{t m}, A_{t m}\right) \in \mathrm{QTM}\)
+and let
+\(M_{c a}=\left(Q, \Lambda, k_{c a}, A_{c a}\right) \in 1 \mathrm{~d}-\mathrm{PQCA}\).
+Then \(M_{t m}\) simulates \(M_{c a}\) if and only if there exists a
+linear-time computable function
+\(T: \mathcal{C}\left(M_{c a}\right) \rightarrow \mathcal{C}\left(M_{t m}\right)\)
+and a function
+\(f: \mathbb{Z}^{+} \times \mathbb{Z}^{+} \rightarrow \mathbb{Z}^{+}\)such
+that for any given configuration
+\(a \in \mathcal{C}\left(M_{c a}\right)\), the probability that
+\(M_{c a}\) accepts \(a\) after \(t\) steps is equal to the probability
+that \(M_{t m}\) accepts \(T(a)\) after \(f(t,|T(a)|)\) steps.
+
+Given
+\(M_{c a}=\left(Q, \Lambda, k_{c a}, A_{c a}\right) \in 1 \mathrm{~d}-\mathrm{PQCA}\)
+we will now define
+\(M_{t m}=\left(K, \Sigma, \mu, k_{t m}, A_{t m}\right) \in \mathrm{QTM}\)
+which will simulate \(M_{c a}\).
+
+Each tape square of \(M_{t m}\) will represent the cell of \(M_{c a}\)
+with the same index. Define
+
+\[\Sigma=\left(Q_{l} \times Q_{m} \times Q_{r}\right) \cup\left(Q_{l} \times Q_{m} \times Q_{r}\right)^{\star}\]
+
+where \(\left(Q_{l} \times Q_{m} \times Q_{r}\right)^{\star}\) is a copy
+of \(\left(Q_{l} \times Q_{m} \times Q_{r}\right)\), so that
+\(\left(p_{l}, p_{m}, p_{r}\right)^{\star} \in\left(Q_{l} \times Q_{m} \times Q_{r}\right)^{\star}\)
+whenever
+\(\left(p_{l}, p_{m}, p_{r}\right) \in\left(Q_{l} \times Q_{m} \times Q_{r}\right)\).
+( \(M_{t m}\) will need to simulate only a finite portion of
+\(M_{c a}\), since we are only concerned with finite configurations of
+\(M_{c a}\), so tape squares containing a symbol in
+\(\left(Q_{l} \times Q_{m} \times Q_{r}\right)^{\star}\) will be used to
+mark the leftmost and rightmost cells of \(M_{c a}\) being simulated at
+that time.) Let \(\epsilon\) be the blank symbol of \(M_{t m}\).
+
+Define
+
+\[K=Q_{l} \times\left\{s_{0}, s_{1}, s_{1}^{\star}, s_{2}, s_{2}^{\star}, s_{3}\right\} \times Q_{r} .\]
+
+Each state of \(M_{t m}\) will consist of one element from \(Q_{l}\) and
+one element from \(Q_{r}\) (in order to "move" states from one tape
+square to another when performing the permutation \(\sigma\), as
+described in section 3) and one element from
+\(\left\{s_{0}, s_{1}, s_{1}^{\star}, s_{2}, s_{2}^{\star}, s_{3}\right\}\).
+
+The simulation of each step of \(M_{c a}\) takes place in three stages.
+The first stage reversibly performs the permutation \(\sigma\) on the
+configuration of \(M_{c a}\) currently represented by the contents of
+the tape. In order to do this, let \(\mu\) take the following values:
+for each \((l, r) \in\)
+\(Q_{l} \times Q_{r},\left(p_{l}, p_{m}, p_{r}\right),\left(q_{l}, q_{m}, q_{r}\right) \in Q_{l} \times Q_{m} \times Q_{r}\),
+define
+
+\[\begin{aligned}
+& \mu\left(\left(l, s_{0}, r\right),\left(p_{l}, p_{m}, p_{r}\right)^{\star},\left(p_{l}, p_{m}, r\right)^{\star},\left(l, s_{1}, p_{r}\right), R\right)=1 \\
+& \mu\left(\left(l, s_{1}, r\right),\left(p_{l}, p_{m}, p_{r}\right),\left(p_{l}, p_{m}, r\right),\left(l, s_{1}, p_{r}\right), R\right)=1 \\
+& \mu\left(\left(l, s_{1}, r\right),\left(p_{l}, p_{m}, p_{r}\right)^{\star},\left(p_{l}, p_{m}, r\right),\left(l, s_{1}^{\star}, p_{r}\right), R\right)=1 \\
+& \mu\left(\left(l, s_{1}^{\star}, r\right),\left(p_{l}, p_{m}, p_{r}\right)^{\star},\left(p_{l}, p_{m}, r\right)^{\star},\left(l, s_{1}^{\star}, p_{r}\right), R\right)=1 \\
+& \mu\left(\left(l, s_{1}^{\star}, r\right),\left(p_{l}, p_{m}, p_{r}\right),\left(l, p_{m}, r\right)^{\star},\left(p_{l}, s_{2}, p_{r}\right), L\right)=1 \\
+& \mu\left(\left(l, s_{2}, r\right),\left(p_{l}, p_{m}, p_{r}\right),\left(l, p_{m}, p_{r}\right),\left(p_{l}, s_{2}, r\right), L\right)=1 \\
+& \mu\left(\left(l, s_{2}, r\right),\left(p_{l}, p_{m}, p_{r}\right)^{\star},\left(l, p_{m}, p_{r}\right),\left(p_{l}, s_{2}^{\star}, r\right), L\right)=1 \\
+& \mu\left(\left(l, s_{2}^{\star}, r\right),\left(p_{l}, p_{m}, p_{r}\right)^{\star},\left(l, p_{m}, p_{r}\right)^{\star},\left(p_{l}, s_{2}^{\star}, r\right), L\right)=1
+\end{aligned}\]
+
+(Note that not all of these transitions will be used given proper input,
+but are added to guarantee wellformedness.) In the second stage of the
+simulation, the state contained in each tape square of \(M_{t m}\) is
+transformed in accordance with \(\lambda\), so for each \((l, r) \in\)
+\(Q_{l} \times Q_{r},\left(p_{l}, p_{m}, p_{r}\right),\left(q_{l}, q_{m}, q_{r}\right) \in Q_{l} \times Q_{m} \times Q_{r}\),
+define
+
+\[\begin{aligned}
+& \mu\left(\left(l, s_{2}^{\star}, r\right),\left(p_{l}, p_{m}, p_{r}\right),\right.\left.\left(q_{l}, q_{m}, q_{r}\right)^{\star},\left(p_{l}, s_{3}, r\right), R\right) \\
+&=\lambda\left(\left(l, p_{m}, p_{r}\right),\left(q_{l}, q_{m}, q_{r}\right)\right) \\
+& \mu\left(\left(l, s_{3}, r\right),\left(p_{l}, p_{m}, p_{r}\right),\right.\left.\left(q_{l}, q_{m}, q_{r}\right),\left(l, s_{3}, r\right), R\right) \\
+&\left.=\lambda\left(p_{l}, p_{m}, p_{r}\right),\left(q_{l}, q_{m}, q_{r}\right)\right) \\
+& \mu\left(\left(l, s_{3}, r\right),\left(p_{l}, p_{m}, p_{r}\right)^{\star},\right.\left.\left(q_{l}, q_{m}, q_{r}\right)^{\star},\left(l, s_{0}, r\right), L\right) \\
+&=\lambda\left(\left(p_{l}, p_{m}, p_{r}\right),\left(q_{l}, q_{m}, q_{r}\right)\right)
+\end{aligned}\]
+
+The third stage of the simulation simply returns the tape head to the
+tape square representing the (new) leftmost cell of \(M_{c a}\) being
+simulated. For each \((l, r) \in\)
+\(Q_{l} \times Q_{r},\left(p_{l}, p_{m}, p_{r}\right),\left(q_{l}, q_{m}, q_{r}\right) \in Q_{l} \times Q_{m} \times Q_{r}\),
+define
+
+\[\mu\left(\left(l, s_{0}, r\right),\left(p_{l}, p_{m}, p_{r}\right),\left(p_{l}, p_{m}, p_{r}\right),\left(l, s_{0}, r\right), L\right)=1\]
+
+Finally, let \(\mu\) take the value 0 everywhere not defined above.
+
+Let \(k_{t m}=k_{c a}\) and define
+
+\[A_{t m}=\left\{q \mid q \in A_{c a}\right\} \cup\left\{q^{\star} \mid q \in A_{c a}\right\} .\]
+
+The following lemma follows from Theorem 3.1 and Theorem 4.1.
+
+Lemma 5.4 If \(M_{c a} \in 1 d-P Q C A\) then \(M_{t m} \in Q T M\).
+
+Given \(a \in \mathcal{C}\left(M_{c a}\right)\) let \(n_{l}\) and
+\(n_{r}\) denote the indices of the leftmost and rightmost non-quiescent
+cells of \(a\) respectively. (If \(n_{l}=n_{r}\) then set
+\(n_{r}=n_{l}+1\). If all cells of \(a\) are quiescent, then choose
+\(n_{l}\) arbitrarily and set \(n_{r}=n_{l}+1\).) Define
+\((s, h, c)=T(a)\) as follows: let
+\(s=\left(\epsilon, s_{0}, \epsilon\right)\), let \(h=n_{l}\), and let
+\(c: \mathbb{Z} \rightarrow \Sigma\) be defined as
+
+\[c(n)= \begin{cases}a(n) & \text { if } n \neq n_{l} \text { and } n \neq n_{r} \\ a(n)^{\star} & \text { if } n=n_{l} \text { or } n=n_{r}\end{cases}\]
+
+Define
+
+\[f(t,|c|)=4 t^{2}+4|c| t-t\]
+
+This is the number of steps required for \(M_{t m}\) to simulate \(t\)
+steps of \(M_{c a}\) on input \(c\)..
+
+Lemma 5.5 For any \(t \in \mathbb{Z}^{+}\)and
+\(c \in \mathcal{C}\left(M_{c a}\right)\), the probability that
+\(M_{c a}\) accepts \(c\) after \(t\) steps is equal to the probability
+that \(M_{t m}\) accepts \(T(c)\) after \(f(t,|T(c)|)\) steps.
+
+Proof. {[}Sketch{]} Assume that we begin the simulation of each time
+step of \(M_{c a}\) with the tape head located over the leftmost cell of
+the finite section of \(M_{c a}\) being simulated, and with the current
+internal state of \(M_{t m}\) equal to
+\(\left(\epsilon, s_{0}, \epsilon\right)\).
+
+First, the permutation \(\sigma\) is performed reversibly in two passes
+of the tape contents, first moving to the far right then returning to
+the left. The finite section of \(M_{c a}\) being simulated will grow by
+one cell on each end during this stage, since the right and left starred
+symbols are shifted one cell to the right and left respectively. Next,
+in a single pass to the right, the state of each tape square is
+"quantumly" transformed in accordance with \(\lambda\). When this has
+been completed, the tape head is returned to the tape square
+representing the (new) leftmost cell of \(M_{c a}\) being simulated.
+Since the tape squares outside of the region between the starred symbols
+are assumed to contain blanks (representing quiescent cells), the
+current internal state of \(M_{t m}\) will again be
+\(\left(\epsilon, s_{0}, \epsilon\right)\).
+
+Thus, after four passes of the current tape contents, \(M_{t m}\) will
+be in a linear superposition of configurations which corresponds to the
+superposition of \(M_{c a}\) after one time step, i.e. each
+configuration of \(M_{t m}\) will have the same amplitude as the
+configuration in the superposition of \(M_{c a}\) which it represents.
+The long-term evolution of \(M_{t m}\) will thus behave exactly as that
+of \(M_{c a}\).
+
+By Lemma 5.4 and Lemma 5.5 we have
+
+Theorem 5.2 Given any \(M_{c a} \in 1 d-P Q C A\), there exists
+\(M_{t m} \in Q T M\) which simulates \(M_{c a}\) with linear slowdown.
+
+\hypertarget{some-resulting-facts}{%
+\section{Some Resulting Facts}\label{some-resulting-facts}}
+
+From the preceeding discussion, we are immediately led to two
+straightforward results.
+
+The first result is an observation concerning the construction in
+section 5.2. The QTM which results from this construction has the
+interesting property that the motion of its tape head is deterministic,
+formalized as follows. Let \(M \in \mathrm{QTM}\) and let \(a\) be an
+arbitrary configuration of \(M\). If \(M\) is assumed to be in
+configuration \(a\) and is run (unobserved) for \(l\) steps and then
+observed, then for any integer \(h\) there is some probability that the
+tape head of \(M\) will be located over the tape square indexed by
+\(h\). We say that \(M\) has deterministic head position if, for all
+\(a \in \mathcal{C}(M)\), \(l \in \mathbb{Z}^{+}\)and
+\(h \in \mathbb{Z}\), we have that this probability is either zero or
+one.
+
+By Theorem 5.1 and Theorem 5.2 we have
+
+Corollary 6.1 For any QTM M, there exists a QTM \(M^{\prime}\) such that
+\(M^{\prime}\) simulates \(M\) with linear slowdown, and such that
+\(M^{\prime}\) has deterministic head position.
+
+In addition to being deterministic, the head position of the QTM
+resulting from the previously mentioned construction is also oblivious;
+for any input of a given length, the position of the tape head at a
+given time will depend only upon this length.
+
+The second result regards the notion of acceptance and rejection by a
+1d-PQCA. Consider
+
+\[M=(Q, \Lambda, k, A) \in 1 \mathrm{~d}-\mathrm{PQCA} .\]
+
+Recall that for any \(a \in \mathcal{C}\) and
+\(l \in \mathbb{Z}^{+}, M\) accepts \(a\) after \(l\) steps with
+probability equal to that of observing an element of \(A\) in the cell
+indexed by \(k\) after \(l\) steps. Of course, this probability may
+differ greatly with any change in \(l\), so that if we are interested in
+whether or not \(M\) recognizes some language
+\(\mathcal{L} \subseteq \mathcal{C}(M)\), we must pair some
+\(l \in \mathbb{Z}^{+}\)with each input \(a \in \mathcal{C}\) and
+observe \(M\) after exactly \(l\) steps have passed. This may seem
+unsatisfactory since it implies that the observer must carefully clock
+the machine and observe it at precisely the right moment, or else the
+computation may be invalid. However, we see that this is a reasonable
+definition of acceptance/rejection, due to the following
+
+Theorem 6.1 For any \(M \in 1 d-P Q C A\) there exists an
+\(M^{\prime} \in 1 d-P Q C A\) so that for any \(a \in \mathcal{C}(M)\)
+and \(l \in \mathbb{Z}^{+}\) there exists an
+\(a^{\prime} \in \mathcal{C}\left(M^{\prime}\right)\) (computable in
+\(\mathcal{O}(l+|a|)\) steps) such that the probability that \(M\)
+accepts a after \(l\) steps is equal to the probability that
+\(M^{\prime}\) accepts a' after \(l^{\prime}\) steps for any
+\(l^{\prime} \geq l\). Proof. Suppose that a 1d-PQCA
+\(M=(Q, \Lambda, k, A)\), with quiescent state \(\epsilon\), is given.
+
+First, define \(M_{t}=\left(Q_{t}, \Lambda_{t}, k, A_{t}\right)\) as
+follows. Let
+
+\[Q_{t}=\{0,1\} \times\{0,1\} \times\{0\}\]
+
+(with \(\epsilon_{t}=(0,0,0)\) as the quiescent state), let
+\(\Lambda_{t}\) be the identity matrix and let \(A_{t}=\{(1,1,0)\}\).
+The action of \(M_{t}\) on any configuration is identical to the
+permutation \(\sigma\).
+
+For any given \(l \in \mathbb{Z}^{+}\), if we define
+\(a_{t} \in \mathcal{C}\left(M_{t}\right)\) as
+
+\[a_{t}(n)= \begin{cases}(0,1,0) & \text { if } n=k \\ (1,0,0) & \text { if } n=k+l \\ (0,0,0) & \text { otherwise, }\end{cases}\]
+
+then on input \(a_{t}\), the cell of \(M_{t}\) indexed by \(k\) will be
+in the state \((1,1,0)\) after exactly \(l\) steps have passed, and at
+no other time will any cell contain this state.
+
+Now define \(M_{1}=\left(Q_{1}, \Lambda_{1}, k, A_{1}\right)\) as
+follows. Let \(Q_{1}=Q \times Q_{t}\) (with quiescent state
+\(\epsilon_{1}=\left(\epsilon, \epsilon_{t}\right)\), let
+\(A_{1}=A \times A_{t}\) and let \(\Lambda_{1}\) be as defined by
+
+\[\lambda_{1}\left(\left(p, p_{t}\right),\left(q, q_{t}\right)\right)=\lambda(p, q) \lambda_{t}\left(p_{t}, q_{t}\right)\]
+
+for \(\left(p, p_{t}\right),\left(q, q_{t}\right) \in Q \times Q_{t}\).
+Clearly \(M_{1} \in 1 \mathrm{~d}-\mathrm{PQCA}\). \(M_{1}\) can be
+viewed as \(M\) and \(M_{t}\) "stacked" on top of one another, evolving
+independently.
+
+For any given \(a \in \mathcal{C}(M)\) and \(l \in \mathbb{Z}^{+}\), if
+we define \(a_{1} \in \mathcal{C}\left(M_{1}\right)\) as
+
+\[a_{1}(n)=\left(a(n), a_{t}(n)\right),\]
+
+where \(a_{t}\) is as defined above, then the probability that \(M_{1}\)
+accepts \(a_{1}\) after \(l\) steps is the same as the probability that
+\(M\) accepts \(a\) after \(l\) steps. Furthermore, the cell of
+\(M_{1}\) indexed by \(k\) will not contain an accepting state at any
+other time, and at no time will any other cell contain an accepting
+state.
+
+Finally, define \(Q_{a}=\{0\} \times\{0,1\} \times\{0\}\), and define
+\(M^{\prime}=\left(Q^{\prime}, \Lambda^{\prime}, k, A^{\prime}\right)\)
+as follows. Let \(Q^{\prime}=Q_{1} \times Q_{a}\), let
+\(A^{\prime}=Q_{1} \times\{(0,1,0)\}\) and define \(\Lambda^{\prime}\)
+as
+
+\[\begin{aligned}
+& \lambda^{\prime}\left(\left(p_{1}, p_{a}\right),\left(q_{1}, q_{a}\right)\right) \\
+& \quad= \begin{cases}\lambda_{1}\left(p_{1}, q_{1}\right) & \text { if } q_{1} \notin A_{1} \text { and } p_{a}=q_{a} \\
+0 & \text { or } q_{1} \in A_{1} \text { and } p_{a} \neq q_{a}\end{cases}
+\end{aligned}\]
+
+for every
+\(\left(p_{1}, p_{a}\right),\left(q_{1}, q_{a}\right) \in Q_{1} \times Q_{a}\).
+Since \(\Lambda_{1}\) is unitary, we must have that \(\Lambda^{\prime}\)
+is unitary, so that \(M^{\prime} \in 1\) d-PQCA (with quiescent state
+\(\left(\epsilon_{1},(0,0,0)\right)\).)
+
+Now, for given \(a \in \mathcal{C}(M)\) and \(l \in \mathbb{Z}^{+}\),
+define \(a^{\prime} \in \mathcal{C}\left(M^{\prime}\right)\) as
+
+\[a^{\prime}(n)=\left(a_{1}(n),(0,0,0)\right),\]
+
+where \(a_{1}\) is as defined above. Consider the evolution of
+\(M^{\prime}\) on input \(a^{\prime}\). By the definition of
+\(\Lambda^{\prime}\), we see that any state
+\(\left(p_{1}, p_{a}\right)\) will be transformed (with nonzero
+amplitude) into state \(\left(q_{1}, q_{a}\right)\) with
+\(q_{a} \neq p_{a}\) (toggling acceptance/rejection) exactly when
+\(q_{1} \in A_{1}\). But if any cell of \(M^{\prime}\) ever contains a
+state in \(A_{1} \times Q_{a}\), then we know that this must be the cell
+indexed by \(k\) and exactly \(l\) steps must have passed (by the
+property of \(M_{1}\) on input \(a_{1}\) mentioned above.) Thus, such a
+transformation will occur at most one time on any given computation
+path, and only on those paths which correspond to paths of \(M_{1}\)
+which accept \(a_{1}\) after \(l\) steps.
+
+\hypertarget{acknowledgements}{%
+\section{Acknowledgements}\label{acknowledgements}}
+
+Many thanks to Eric Bach for his valuable insights and advice, and for
+introducing me to quantum computing. Thanks also to Anne Condon and
+Walter Ludwig for their helpful comments and suggestions, and to
+Christoph Dürr for pointing out an error in an earlier version of this
+paper.
+
+\hypertarget{references}{%
+\section{References}\label{references}}
+
+{[}1{]} R. Feynman, Simulating Physics with Computers, International
+Journal of Theoretical Physics, Vol. 21, nos. 6/7 (1982) 467-488.
+
+{[}2{]} D. Deutsch, Quantum Theory, the Church-Turing Principle and the
+Universal Quantum Computer, Proc. R. Soc. Lond., Vol. A400 (1985)
+97-117.
+
+{[}3{]} E. Bernstein and U. Vazirani, Quantum Complexity Theory, Proc.
+25th Ann. ACM Symp. on Theory of Computing (1993) 11-20.
+
+{[}4{]} A. Yao, Quantum Circuit Complexity, Proc. 34th Ann. Symp.
+Foundations of Computer Science (1993) 352-361.
+
+{[}5{]} P. Shor, Algorithms for Quantum Computation: Discrete Logarithms
+and Factoring, Proc. 35th Ann. Symp. Foundations of Computer Science
+(1994) 124-134.
+
+{[}6{]} K. Morita and M. Harao, Computation Universality of
+One-Dimensional Reversible (Injective) Cellular Automata, Transactions
+of the IEICE, Vol. E 72 (1989) 758-762.
+
+{[}7{]} R. Cooke, Infinite Matrices and Sequence Spaces, Macmillan and
+Co., London, 1950.
+
+{[}8{]} N. Young, An Introduction to Hilbert Space, Cambridge University
+Press, Cambridge, 1988.
+
+\end{document}
